@@ -4,7 +4,6 @@ import bodyParser from "body-parser";
 const app = express();
 const port = 3000;
 
-// Array to store blogs in memory
 let blogs = [];
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -38,10 +37,8 @@ app.post("/submit", (req, res) => {
         dateCreated: new Date().toLocaleDateString()
     };
     
-    // Add the new blog to the blogs array
     blogs.push(newBlog);
     
-    // Redirect to home page
     res.redirect("/");
 });
 
@@ -80,7 +77,7 @@ app.post("/edit/:id", (req, res) => {
             id: blogId,
             title: req.body.title,
             content: req.body.content,
-            dateCreated: blogs[blogIndex].dateCreated, // Keep original creation date
+            dateCreated: blogs[blogIndex].dateCreated,
             dateUpdated: new Date().toLocaleDateString()
         };
         res.redirect(`/blog/${blogId}`);

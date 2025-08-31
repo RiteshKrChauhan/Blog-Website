@@ -1,4 +1,3 @@
-/* Sticky Footer CSS */
 html, body {
     height: 100%;
 }
@@ -11,22 +10,17 @@ body {
 
 main {
     flex: 1 0 auto;
-    /* This ensures main takes up the available space and pushes footer down */
 }
 
 footer {
     flex-shrink: 0;
-    /* This prevents the footer from shrinking */
     margin-top: auto;
-    /* This pushes the footer to the bottom when content is short */
 }
 
-/* Additional styling for better appearance */
 .container {
     padding-bottom: 2rem;
 }
 
-/* Ensure cards have consistent height */
 .card {
     height: 100%;
     transition: transform 0.2s ease-in-out;
@@ -37,7 +31,6 @@ footer {
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-/* Better button spacing */
 .btn + .btn {
     margin-left: 0.5rem;
 }
