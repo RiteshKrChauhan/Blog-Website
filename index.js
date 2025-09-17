@@ -1,104 +1,122 @@
 import express from "express";
 import bodyParser from "body-parser";
+import pg from "pg";
+import dotenv from "dotenv";
 
 const app = express();
 const port = 3000;
-
-let blogs = [];
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.static("public"));
 
-app.get("/", (req, res) => {
-  res.render("index.ejs", { blogs: blogs });
+dotenv.config();
+
+const db = new pg.Client({
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
 });
 
-app.get("/about", (req, res) => {
+db.connect();
+
+app.get("/", async (req, res) => {
+  try {
+    const result = await db.query("SELECT * FROM blogs");
+    res.render("index.ejs", { blogs: result.rows });
+  } catch (err) {
+    console.error("Error fetching blogs:", err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.get("/about", async (req, res) => {
     res.render("about.ejs");
 });
 
-app.get("/contact", (req, res) => {
+app.get("/contact", async (req, res) => {
     res.render("contact.ejs");
 });
 
-app.get("/create", (req, res) => {
+app.get("/create", async (req, res) => {
     res.render("create.ejs");
 });
 
-app.post("/submit", (req, res) => {
+app.post("/submit", async (req, res) => {
     const { title, content } = req.body;
-    
-    // Create a new blog object with a unique ID
-    const newBlog = {
-        id: blogs.length + 1,
-        title: title,
-        content: content,
-        dateCreated: new Date().toLocaleDateString()
-    };
-    
-    blogs.push(newBlog);
-    
-    res.redirect("/");
+
+    // Create a new blog object
+    try {
+        await db.query("INSERT INTO blogs (title, content, date_created) VALUES ($1, $2, $3)", [title, content, new Date()]);
+        res.redirect("/");
+    } catch (err) {
+        console.error("Error creating blog:", err);
+        res.status(500).send("Internal Server Error");
+    }
 });
 
 // Route to view individual blog post
-app.get("/blog/:id", (req, res) => {
+app.get("/blog/:id", async (req, res) => {
     const blogId = parseInt(req.params.id);
-    const blog = blogs.find(b => b.id === blogId);
-    
-    if (blog) {
-        res.render("blog.ejs", { blog: blog });
-    } else {
-        res.status(404).send("Blog not found");
+    try {
+        const result = await db.query("SELECT * FROM blogs WHERE id = $1", [blogId]);
+        const blog = result.rows[0];
+        if (blog) {
+            res.render("blog.ejs", { blog: blog });
+        } else {
+            res.status(404).send("Blog not found");
+        }
+    } catch (err) {
+        console.error("Error fetching blog:", err);
+        res.status(500).send("Internal Server Error");
     }
 });
 
 // Route to display edit form for a specific blog
-app.get("/edit/:id", (req, res) => {
+app.get("/edit/:id", async (req, res) => {
     const blogId = parseInt(req.params.id);
-    const blog = blogs.find(b => b.id === blogId);
-    
-    if (blog) {
-        res.render("edit.ejs", { blog: blog });
-    } else {
-        res.status(404).send("Blog not found");
+    try {
+        const result = await db.query("SELECT * FROM blogs WHERE id = $1", [blogId]);
+        const blog = result.rows[0];
+        if (blog) {
+            res.render("edit.ejs", { blog: blog });
+        } else {
+            res.status(404).send("Blog not found");
+        }
+    } catch (err) {
+        console.error("Error fetching blog:", err);
+        res.status(500).send("Internal Server Error");
     }
 });
 
 // Route to handle blog edit submission
-app.post("/edit/:id", (req, res) => {
+app.post("/edit/:id", async (req, res) => {
     const blogId = parseInt(req.params.id);
-    const blogIndex = blogs.findIndex(b => b.id === blogId);
-    
-    if (blogIndex !== -1) {
-        // Update the blog
-        blogs[blogIndex] = {
-            id: blogId,
-            title: req.body.title,
-            content: req.body.content,
-            dateCreated: blogs[blogIndex].dateCreated,
-            dateUpdated: new Date().toLocaleDateString()
-        };
+    const { title, content } = req.body;
+
+    try {
+        await db.query("UPDATE blogs SET title = $1, content = $2, date_updated = $3 WHERE id = $4", [title, content, new Date(), blogId]);
         res.redirect(`/blog/${blogId}`);
-    } else {
-        res.status(404).send("Blog not found");
+    } catch (err) {
+        console.error("Error updating blog:", err);
+        res.status(500).send("Internal Server Error");
     }
 });
 
 // Route to handle blog deletion
-app.post("/delete/:id", (req, res) => {
+app.post("/delete/:id", async (req, res) => {
     const blogId = parseInt(req.params.id);
-    const blogIndex = blogs.findIndex(b => b.id === blogId);
-    
-    if (blogIndex !== -1) {
-        blogs.splice(blogIndex, 1);
+    try {
+        await db.query("DELETE FROM blogs WHERE id = $1", [blogId]);
         res.redirect("/");
-    } else {
-        res.status(404).send("Blog not found");
+    } catch (err) {
+        console.error("Error deleting blog:", err);
+        res.status(500).send("Internal Server Error");
     }
 });
 
 app.listen(port, () => {
-  console.log(`Listening on port ${port}`);
+  console.log(`Server running on http://localhost:${port}`);
 });

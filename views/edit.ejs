@@ -43,9 +43,9 @@
                     
                     <div class="mt-4 p-3 bg-light rounded">
                         <small class="text-muted">
-                            <strong>Original Creation Date:</strong> <%= blog.dateCreated %>
-                            <% if (blog.dateUpdated) { %>
-                                <br><strong>Last Updated:</strong> <%= blog.dateUpdated %>
+                            <strong>Original Creation Date:</strong> <%= new Date(blog.date_created).toLocaleDateString() %>
+                            <% if (blog.date_updated) { %>
+                                <br><strong>Last Updated:</strong> <%= new Date(blog.date_updated).toLocaleDateString() %>
                             <% } %>
                         </small>
                     </div>

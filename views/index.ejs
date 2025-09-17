@@ -36,9 +36,9 @@
                                         <% } %>
                                     </p>
                                     <small class="text-muted">
-                                        Created on: <%= blog.dateCreated %>
-                                        <% if (blog.dateUpdated) { %>
-                                            <br>Updated on: <%= blog.dateUpdated %>
+                                        Created on: <%= new Date(blog.date_created).toLocaleDateString() %>
+                                        <% if (blog.date_updated) { %>
+                                            <br>Updated on: <%= new Date(blog.date_updated).toLocaleDateString() %>
                                         <% } %>
                                     </small>
                                     <div class="mt-3">
