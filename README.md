@@ -16,8 +16,10 @@ A modern, responsive blog website built with Node.js, Express, and EJS that allo
 ## 🛠️ Technologies Used
 
 - **Backend**: Node.js with Express.js
+- **Database**: PostgreSQL with node-postgres (pg) driver
 - **Template Engine**: EJS (Embedded JavaScript)
 - **Frontend**: Bootstrap 5 for responsive design
+- **Environment Variables**: dotenv for configuration management
 - **Body Parser**: For handling form data
 - **Static Files**: Custom CSS for additional styling
 
@@ -27,8 +29,10 @@ A modern, responsive blog website built with Node.js, Express, and EJS that allo
 {
   "body-parser": "^2.2.0",
   "bootstrap": "^5.3.7",
+  "dotenv": "^17.2.2",
   "ejs": "^3.1.10",
-  "express": "^5.1.0"
+  "express": "^5.1.0",
+  "pg": "^8.16.3"
 }
 ```
 
@@ -36,9 +40,10 @@ A modern, responsive blog website built with Node.js, Express, and EJS that allo
 
 ```
 blog-website/
-├── index.js                 # Main server file
+├── index.js                 # Main server file with PostgreSQL integration
 ├── package.json            # Project dependencies and scripts
 ├── package-lock.json       # Dependency lock file
+├── .env                    # Environment variables (database config)
 ├── .gitignore             # Git ignore file
 ├── public/                # Static files
 │   └── styles/           # CSS files
@@ -70,11 +75,70 @@ blog-website/
 | `/edit/:id` | POST | Update existing blog post |
 | `/delete/:id` | POST | Delete blog post |
 
-## 💾 Data Storage
+## �️ Database Integration - PostgreSQL
 
-Currently, the application stores blog posts in memory using a JavaScript array. This means:
-- ⚠️ **Data is not persistent** - all blog posts will be lost when the server restarts
-- 💡 **For production use**, consider implementing a database solution like MongoDB, PostgreSQL, or MySQL
+This application uses **PostgreSQL** as its primary database for persistent data storage. All blog posts are stored in a PostgreSQL database with the following setup:
+
+### Database Configuration
+- **Database**: PostgreSQL 
+- **Driver**: node-postgres (pg) v8.16.3
+- **Connection**: Environment variables for secure configuration
+- **Features**: Full CRUD operations with async/await support
+
+### Database Schema
+
+The application uses a `blogs` table with the following structure:
+
+```sql
+CREATE TABLE blogs (
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    date_created DATE NOT NULL,
+    date_updated DATE
+);
+```
+
+**Table Fields:**
+- `id`: Auto-incrementing primary key
+- `title`: Blog post title (required)
+- `content`: Blog post content (required)  
+- `date_created`: Timestamp when post was created
+- `date_updated`: Timestamp when post was last updated (nullable)
+
+### Environment Variables Setup
+
+Create a `.env` file in your project root with the following variables:
+
+```env
+DB_USER=your_postgres_username
+DB_HOST=localhost
+DB_NAME=blogs
+DB_PASSWORD=your_postgres_password
+DB_PORT=5432
+```
+
+### Setup Instructions
+
+1. **Install PostgreSQL** on your system
+2. **Create Database:**
+   ```sql
+   CREATE DATABASE blogs;
+   ```
+3. **Create Table:**
+   ```sql
+   \c blogs;
+   CREATE TABLE blogs (
+       id SERIAL PRIMARY KEY,
+       title TEXT NOT NULL,
+       content TEXT NOT NULL,
+       date_created DATE NOT NULL,
+       date_updated DATE
+   );
+   ```
+4. **Configure Environment:** Create `.env` file with your database credentials
+5. **Install Dependencies:** `npm install`
+6. **Run Application:** `node index.js`
 
 ## 🎨 Features Overview
 
@@ -100,7 +164,6 @@ Each blog post contains:
 
 ## 🔮 Future Enhancements
 
-- **Database Integration**: Add persistent data storage
 - **User Authentication**: Allow multiple users with login/logout
 - **Rich Text Editor**: Enable formatted text, images, and links
 - **Categories & Tags**: Organize posts by topics
@@ -110,6 +173,9 @@ Each blog post contains:
 - **SEO Optimization**: Meta tags and URL optimization
 - **RSS Feed**: Enable blog subscriptions
 - **Admin Dashboard**: Statistics and management interface
+- **Database Indexing**: Optimize query performance
+- **Connection Pooling**: Handle multiple concurrent database connections
+- **Data Validation**: Add comprehensive input validation and sanitization
 
 **Happy Blogging! 🎉**
 
