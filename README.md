@@ -1,6 +1,6 @@
 # 📝 Blog Website
 
-A modern, responsive blog website built with Node.js, Express, and EJS that allows users to create, read, update, and delete blog posts.
+A modern, responsive blog website built with Node.js, Express, EJS, and PostgreSQL that allows users to create, read, update, and delete blog posts with persistent database storage.
 
 ## 🌟 Features
 
@@ -75,7 +75,7 @@ blog-website/
 | `/edit/:id` | POST | Update existing blog post |
 | `/delete/:id` | POST | Delete blog post |
 
-## �️ Database Integration - PostgreSQL
+## 🗄️ Database Integration - PostgreSQL
 
 This application uses **PostgreSQL** as its primary database for persistent data storage. All blog posts are stored in a PostgreSQL database with the following setup:
 
@@ -127,7 +127,6 @@ DB_PORT=5432
    ```
 3. **Create Table:**
    ```sql
-   \c blogs;
    CREATE TABLE blogs (
        id SERIAL PRIMARY KEY,
        title TEXT NOT NULL,
